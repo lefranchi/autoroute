@@ -73,6 +73,17 @@ int main(int argc, char *argv[]) {
 
 	print_clif_info(clifs);
 
+	define_rt_tables(clifs);
+
+	define_rt_rules(clifs);
+
+	delete_nexthop_route();
+
+	balance_links(clifs);
+
+	route_flush_cache();
+
+	free(gw);
 	freeifaddrs(ifaddr);
 
 	printf("\nFinished!\n");

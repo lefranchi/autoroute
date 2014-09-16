@@ -29,22 +29,18 @@ int is_ifa_enabled(char* ifa_name) {
 	return 0;
 }
 
-int find_gateway(char* ifname, char** ifgw) {
+int find_gateway(char* ifname, char** ifgw)
+{
+
 	char command[80] = "";
 
-	strcat(command, "/sbin/route -n | grep ");
-	strcat(command, ifname);
-	strcat(command, " | grep '^0.0.0.0' | awk '{ print $2 }'");
+	sprintf(command, "/sbin/route -n | grep %s | grep '^0.0.0.0' | awk '{ print $2 }'", ifname);
 
 	int ret_value = execute_command(command, ifgw);
 
 	if (strcmp(*ifgw, "") == 0) {
 
-		strcpy(command, "");
-
-		strcat(command, "/sbin/ifconfig ");
-		strcat(command, ifname);
-		strcat(command, " | grep P-t-P | awk '{print $3}' | awk -F: '{print $2}'");
+		sprintf(command, "/sbin/ifconfig %s | grep P-t-P | awk '{print $3}' | awk -F: '{print $2}'", ifname);
 
 		ret_value = execute_command(command, ifgw);
 	}
@@ -57,7 +53,7 @@ int init_rt_tables_file(struct clif clifs[])
 	char rt_default_file_path[100];
 	char rt_name[5];
 	FILE *pFile;
-	int rt_index = 255;
+	int rt_index = 253;
 
 	realpath(RT_SOURCE_FILE_PATH, rt_default_file_path);
 	copy_file(rt_default_file_path, RT_TARGET_FILE_PATH);
@@ -72,15 +68,11 @@ int init_rt_tables_file(struct clif clifs[])
 			if(strlen(clifs[ix].name) == 0)
 				break;
 
-			strcpy(rt_name, "");
-			sprintf(rt_name, "%d", --rt_index);
-			strcat(rt_name, "_");
-			strcat(rt_name, clifs[ix].name);
-			strcat(rt_name, "\n");
+			sprintf(rt_name, "%d\trt_%s\n", --rt_index, clifs[ix].name);
 
 			fputs(rt_name, pFile);
 
-			strncpy(clifs[ix].rt_name, rt_name, strlen(rt_name) - 1);
+			sprintf(clifs[ix].rt_name, "rt_%s", clifs[ix].name);
 
 		}
 
@@ -114,4 +106,96 @@ int print_clif_info(struct clif clifs[])
 
 	return 0;
 
+}
+
+int define_rt_tables(struct clif clifs[])
+{
+	char *buff = malloc(15);
+	char command[256];
+
+	int ix;
+	for(ix = 0; ix < CLIF_ARRAY_SIZE; ix++) {
+
+		if(strlen(clifs[ix].name) == 0)
+			break;
+
+		sprintf(command, "/sbin/ip route del default via %s table %s", clifs[ix].gw, clifs[ix].rt_name);
+
+		execute_command(command, &buff);
+
+		sprintf(command, "/sbin/ip route add default via %s table %s", clifs[ix].gw, clifs[ix].rt_name);
+
+		execute_command(command, &buff);
+
+	}
+
+	free(buff);
+
+	return 0;
+}
+
+int define_rt_rules(struct clif clifs[])
+{
+	char *buff = malloc(15);
+	char command[256];
+
+	int ix;
+	for(ix = 0; ix < CLIF_ARRAY_SIZE; ix++) {
+
+		if(strlen(clifs[ix].name) == 0)
+			break;
+
+		sprintf(command, "/sbin/ip rule del from %s table %s", clifs[ix].ip, clifs[ix].rt_name);
+
+		execute_command(command, &buff);
+
+		sprintf(command, "/sbin/ip rule add from %s table %s", clifs[ix].ip, clifs[ix].rt_name);
+
+		execute_command(command, &buff);
+
+	}
+
+	free(buff);
+
+	return 0;
+}
+
+int delete_nexthop_route()
+{
+	char *buff = malloc(15);
+
+	return execute_command("ip route del default scope global", &buff);
+
+}
+
+int balance_links(struct clif clifs[])
+{
+	char *buff = malloc(15);
+	char command[256];
+	char nexthop_template[64] = " nexthop via %s dev %s weight 1 ";
+	char nexthop_buffer[70];
+
+	strcpy(command, "/sbin/ip route add default scope global ");
+
+	int ix;
+	for(ix = 0; ix < CLIF_ARRAY_SIZE; ix++) {
+
+		if(strlen(clifs[ix].name) == 0)
+			break;
+
+		sprintf(nexthop_buffer, nexthop_template, clifs[ix].gw, clifs[ix].name);
+
+		strcat(command, nexthop_buffer);
+
+	}
+
+	return execute_command(command, &buff);
+
+}
+
+int route_flush_cache()
+{
+	char *buff = malloc(15);
+
+	return execute_command("/sbin/ip route flush cache", &buff);
 }

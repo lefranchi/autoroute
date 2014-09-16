@@ -21,6 +21,8 @@ int execute_command(char* command, char** ret_val)
 	if (fp == NULL) {
 		printf("Failed to run command %s: \n", command);
 		return 0;
+	} else {
+		printf("Executing: %s \n", command);
 	}
 
 	if (fgets(buff, sizeof(buff) - 1, fp) != NULL) {

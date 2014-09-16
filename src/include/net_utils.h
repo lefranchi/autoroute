@@ -36,4 +36,14 @@ int print_clif_info(struct clif[]);
 
 int init_rt_tables_file(struct clif[]);
 
+int define_rt_tables(struct clif[]);
+
+int define_rt_rules(struct clif[]);
+
+int delete_nexthop_route();
+
+int balance_links(struct clif[]);
+
+int route_flush_cache();
+
 #endif /* NET_UTILS_H_ */
