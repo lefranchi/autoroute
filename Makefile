@@ -1,4 +1,4 @@
-OBJS = src/autoroute.c src/include/autoroute_utils.h src/utils/autoroute_utils.c
+OBJS = src/autoroute.c src/include/sys_utils.h src/utils/sys_utils.c src/include/net_utils.h src/utils/net_utils.c
 
 
 all: main
