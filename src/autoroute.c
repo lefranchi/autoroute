@@ -22,7 +22,7 @@
 
 int main(int argc, char *argv[]) {
 
-	printf("Iniciando autoroute...\n");
+	printf("Starting autoroute...\n\n");
 
 	struct ifaddrs *ifaddr, *ifa;
 	int family, s, n;
@@ -61,19 +61,16 @@ int main(int argc, char *argv[]) {
 
 			printf("Interface: %s | IP: %s | GW: %s \n", ifa->ifa_name, host, gw);
 
-			/*
-			 printf("%-8s %s (%d)\n", ifa->ifa_name,
-			 (family == AF_PACKET) ? "AF_PACKET" :
-			 (family == AF_INET) ? "AF_INET" :
-			 (family == AF_INET6) ? "AF_INET6" : "???", family);
-
-			 printf("\t\taddress: <%s>\n", host);
-			 */
 		}
 
 	}
 
+	init_rt_tables_file();
+
 	freeifaddrs(ifaddr);
+
+	printf("\nFinished!\n");
+
 	exit(EXIT_SUCCESS);
 
 }

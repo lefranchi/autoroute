@@ -8,6 +8,7 @@
 #include "../include/autoroute_utils.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 int is_ifa_enabled(char* ifa_name) {
@@ -26,8 +27,7 @@ int is_ifa_enabled(char* ifa_name) {
 	return 0;
 }
 
-int find_gateway(char* ifname, char** ifgw)
-{
+int find_gateway(char* ifname, char** ifgw) {
 	char command[80] = "";
 
 	strcat(command, "/sbin/route -n | grep ");
@@ -42,14 +42,14 @@ int find_gateway(char* ifname, char** ifgw)
 
 		strcat(command, "/sbin/ifconfig ");
 		strcat(command, ifname);
-		strcat(command, " | grep P-t-P | awk '{print $3}' | awk -F: '{print $2}'");
+		strcat(command,
+				" | grep P-t-P | awk '{print $3}' | awk -F: '{print $2}'");
 
 		ret_value = execute_command(command, ifgw);
 	}
 
 	return ret_value;
 }
-
 
 int execute_command(char* command, char** ret_val) {
 	FILE *fp;
@@ -69,5 +69,41 @@ int execute_command(char* command, char** ret_val) {
 
 	pclose(fp);
 
-	return 1;
+	return 0;
+}
+
+int copy_file(char *source_file, char *target_file)
+{
+
+	char ch;
+	FILE * source, *target;
+
+	source = fopen(source_file, "r");
+	target = fopen(target_file, "w");
+
+	if (source == NULL || target == NULL) {
+		printf("Source or Target file is null...\n");
+
+		if (target == NULL)
+			printf("Excute chmod 777 in %s to give write permission.\n", target_file);
+
+		exit(EXIT_FAILURE);
+	}
+
+	while ((ch = fgetc(source)) != EOF)
+		fputc(ch, target);
+
+	fclose(source);
+	fclose(target);
+
+	return 0;
+}
+
+int init_rt_tables_file()
+{
+	char rt_default_file_path[100];
+	realpath(RT_SOURCE_FILE_PATH, rt_default_file_path);
+	copy_file(rt_default_file_path, RT_TARGET_FILE_PATH);
+
+	return 0;
 }
