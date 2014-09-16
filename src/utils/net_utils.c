@@ -6,11 +6,12 @@
  */
 
 #include "../include/net_utils.h"
-#include "../include/sys_utils.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "../include/sys_utils.h"
 
 int is_ifa_enabled(char* ifa_name) {
 
@@ -91,4 +92,26 @@ int init_rt_tables_file(struct clif clifs[])
 	fclose(pFile);
 
 	return 0;
+}
+
+int print_clif_info(struct clif clifs[])
+{
+
+	printf("%10s %15s %15s %15s \n", "iface", "ip", "gw", "rt");
+	printf("------------------------------------------------------------------------------- \n");
+
+	int ix;
+	for(ix = 0; ix < CLIF_ARRAY_SIZE; ix++) {
+
+		if(strlen(clifs[ix].name) == 0)
+			break;
+
+		printf("%10s %15s %15s %15s \n", clifs[ix].name, clifs[ix].ip, clifs[ix].gw, clifs[ix].rt_name);
+
+	}
+
+	printf("------------------------------------------------------------------------------- \n");
+
+	return 0;
+
 }

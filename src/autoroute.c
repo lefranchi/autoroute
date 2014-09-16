@@ -71,16 +71,7 @@ int main(int argc, char *argv[]) {
 
 	init_rt_tables_file(clifs);
 
-
-	int ix;
-	for(ix = 0; ix < CLIF_ARRAY_SIZE; ix++) {
-
-		if(strlen(clifs[ix].name) == 0)
-			break;
-
-		printf("If: %s - IP: %s - GW: %s - RT: %s \n", clifs[ix].name, clifs[ix].ip, clifs[ix].gw, clifs[ix].rt_name);
-
-	}
+	print_clif_info(clifs);
 
 	freeifaddrs(ifaddr);
 

@@ -32,6 +32,8 @@ int is_ifa_enabled(char* ifa_name);
 
 int find_gateway(char*, char**);
 
+int print_clif_info(struct clif[]);
+
 int init_rt_tables_file(struct clif[]);
 
 #endif /* NET_UTILS_H_ */
