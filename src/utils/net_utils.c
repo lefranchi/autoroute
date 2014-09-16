@@ -43,8 +43,7 @@ int find_gateway(char* ifname, char** ifgw) {
 
 		strcat(command, "/sbin/ifconfig ");
 		strcat(command, ifname);
-		strcat(command,
-				" | grep P-t-P | awk '{print $3}' | awk -F: '{print $2}'");
+		strcat(command, " | grep P-t-P | awk '{print $3}' | awk -F: '{print $2}'");
 
 		ret_value = execute_command(command, ifgw);
 	}
@@ -52,11 +51,44 @@ int find_gateway(char* ifname, char** ifgw) {
 	return ret_value;
 }
 
-int init_rt_tables_file()
+int init_rt_tables_file(struct clif clifs[])
 {
 	char rt_default_file_path[100];
+	char rt_name[5];
+	FILE *pFile;
+	int rt_index = 255;
+
 	realpath(RT_SOURCE_FILE_PATH, rt_default_file_path);
 	copy_file(rt_default_file_path, RT_TARGET_FILE_PATH);
+
+	pFile = fopen(RT_TARGET_FILE_PATH, "a");
+
+	if(pFile != NULL) {
+
+		int ix;
+		for(ix = 0; ix < CLIF_ARRAY_SIZE; ix++) {
+
+			if(strlen(clifs[ix].name) == 0)
+				break;
+
+			strcpy(rt_name, "");
+			sprintf(rt_name, "%d", --rt_index);
+			strcat(rt_name, "_");
+			strcat(rt_name, clifs[ix].name);
+			strcat(rt_name, "\n");
+
+			fputs(rt_name, pFile);
+
+			strncpy(clifs[ix].rt_name, rt_name, strlen(rt_name) - 1);
+
+		}
+
+	} else {
+		printf("Error opening file to append: %s\n", RT_TARGET_FILE_PATH);
+		exit(EXIT_FAILURE);
+	}
+
+	fclose(pFile);
 
 	return 0;
 }

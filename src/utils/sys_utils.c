@@ -12,7 +12,8 @@
 #include <string.h>
 
 
-int execute_command(char* command, char** ret_val) {
+int execute_command(char* command, char** ret_val)
+{
 	FILE *fp;
 	char buff[2048];
 
@@ -35,7 +36,6 @@ int execute_command(char* command, char** ret_val) {
 
 int copy_file(char *source_file, char *target_file)
 {
-
 	char ch;
 	FILE * source, *target;
 

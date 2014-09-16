@@ -11,10 +11,27 @@
 #define RT_SOURCE_FILE_PATH "./conf/rt_tables"
 #define RT_TARGET_FILE_PATH "/etc/iproute2/rt_tables"
 
+#define _GNU_SOURCE     /* To get defns of NI_MAXSERV and NI_MAXHOST */
+
+#define CLIF_ARRAY_SIZE 12
+
+#include <netdb.h>
+
+
+/*
+ * CL - Netwrok Interface.
+ */
+struct clif {
+	char name[6];
+	char ip[NI_MAXHOST];
+	char gw[NI_MAXHOST];
+	char rt_name[15];
+};
+
 int is_ifa_enabled(char* ifa_name);
 
 int find_gateway(char*, char**);
 
-int init_rt_tables_file();
+int init_rt_tables_file(struct clif[]);
 
 #endif /* NET_UTILS_H_ */

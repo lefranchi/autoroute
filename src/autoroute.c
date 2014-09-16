@@ -28,6 +28,9 @@ int main(int argc, char *argv[]) {
 	char host[NI_MAXHOST];
 	char *gw = malloc(15);
 
+	int clif_index = 0;
+	struct clif clifs[CLIF_ARRAY_SIZE];
+
 	if (getifaddrs(&ifaddr) == -1) {
 		perror("getifaddrs");
 		exit(EXIT_FAILURE);
@@ -58,13 +61,26 @@ int main(int argc, char *argv[]) {
 
 			find_gateway(ifa->ifa_name, &gw);
 
-			printf("Interface: %s | IP: %s | GW: %s \n", ifa->ifa_name, host, gw);
+			strcpy(clifs[clif_index].name, ifa->ifa_name);
+			strcpy(clifs[clif_index].ip, host);
+			strcpy(clifs[clif_index++].gw, gw);
 
 		}
 
 	}
 
-	init_rt_tables_file();
+	init_rt_tables_file(clifs);
+
+
+	int ix;
+	for(ix = 0; ix < CLIF_ARRAY_SIZE; ix++) {
+
+		if(strlen(clifs[ix].name) == 0)
+			break;
+
+		printf("If: %s - IP: %s - GW: %s - RT: %s \n", clifs[ix].name, clifs[ix].ip, clifs[ix].gw, clifs[ix].rt_name);
+
+	}
 
 	freeifaddrs(ifaddr);
 
