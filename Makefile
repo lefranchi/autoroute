@@ -1,4 +1,4 @@
-OBJS = src/autoroute.c
+OBJS = src/autoroute.c src/include/autoroute_utils.h src/utils/autoroute_utils.c
 
 
 all: main
@@ -9,4 +9,4 @@ main:
 
 
 clean:
-	$(RM) main $(OBJS)  
+	rm -f *.o  

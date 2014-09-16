@@ -1,16 +1,80 @@
-//==========================================================
-// 	File: 	autoroute.c
-//	Author:	Leandro Franchi
-//	Date:	12/09/2014
-//	Desc:	Rotina de Auto Roteamento de Rede.
-//==========================================================
+/*
+ * autoroute_utils.h
+ *
+ *  Created on: Sep 12, 2014
+ *      Author: lfranchi
+ */
 
+#define _GNU_SOURCE     /* To get defns of NI_MAXSERV and NI_MAXHOST */
+#include <string.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <ifaddrs.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <linux/if_link.h>
 
-int main(int argc, char *argv[])
-{
-	printf("Iniciando autoroute...");
 
-	return 0;
+
+#include "include/autoroute_utils.h"
+
+int main(int argc, char *argv[]) {
+
+	printf("Iniciando autoroute...\n");
+
+	struct ifaddrs *ifaddr, *ifa;
+	int family, s, n;
+	char host[NI_MAXHOST];
+	char *gw = malloc(15);
+
+	if (getifaddrs(&ifaddr) == -1) {
+		perror("getifaddrs");
+		exit(EXIT_FAILURE);
+	}
+
+	for (ifa = ifaddr, n = 0; ifa != NULL; ifa = ifa->ifa_next, n++) {
+
+		if (ifa->ifa_addr == NULL)
+			continue;
+
+		family = ifa->ifa_addr->sa_family;
+
+		if (family == AF_INET) {
+
+			if (is_ifa_enabled(ifa->ifa_name) == 0)
+				continue;
+
+			s = getnameinfo(ifa->ifa_addr,
+					(family == AF_INET) ?
+							sizeof(struct sockaddr_in) :
+							sizeof(struct sockaddr_in6), host, NI_MAXHOST,
+					NULL, 0, NI_NUMERICHOST);
+
+			if (s != 0) {
+				printf("getnameinfo() failed: %s\n", gai_strerror(s));
+				continue;
+			}
+
+			find_gateway(ifa->ifa_name, &gw);
+
+			printf("Interface: %s | IP: %s | GW: %s \n", ifa->ifa_name, host, gw);
+
+			/*
+			 printf("%-8s %s (%d)\n", ifa->ifa_name,
+			 (family == AF_PACKET) ? "AF_PACKET" :
+			 (family == AF_INET) ? "AF_INET" :
+			 (family == AF_INET6) ? "AF_INET6" : "???", family);
+
+			 printf("\t\taddress: <%s>\n", host);
+			 */
+		}
+
+	}
+
+	freeifaddrs(ifaddr);
+	exit(EXIT_SUCCESS);
+
 }
 
