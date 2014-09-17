@@ -48,7 +48,7 @@ int copy_file(char *source_file, char *target_file)
 		printf("Source or Target file is null...\n");
 
 		if (target == NULL)
-			printf("Excute chmod 777 in %s to give write permission.\n", target_file);
+			printf("Execute sudo chmod 777 %s.\n", target_file);
 
 		exit(EXIT_FAILURE);
 	}

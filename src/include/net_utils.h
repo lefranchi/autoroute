@@ -46,4 +46,6 @@ int balance_links(struct clif[]);
 
 int route_flush_cache();
 
+int load_clifs(struct clif[]);
+
 #endif /* NET_UTILS_H_ */
