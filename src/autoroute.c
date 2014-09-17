@@ -1,6 +1,11 @@
 /*
  * autoroute_utils.h
  *
+ * 	Description: List allowed interfaces, gets ip and gateway. Creates
+ *				route table and execute commands to use these interfaces
+ * 				to traffic.
+ *
+ *
  *  Created on: Sep 12, 2014
  *      Author: lfranchi
  */
