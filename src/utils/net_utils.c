@@ -24,7 +24,7 @@
 int is_ifa_enabled(char* ifa_name) {
 
 	int allowed_if_names_size = 3;
-	char *allowed_if_names[3] = { "eth", "wlan", "ppp" };
+	char *allowed_if_names[3] = { "ppp" }; //TODO CARREGAR DE ARQUIVO DE CONFIGURACOES
 
 	int ix;
 	for (ix = 0; ix < allowed_if_names_size; ix++) {
