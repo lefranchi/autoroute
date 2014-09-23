@@ -25,7 +25,7 @@
 int is_ifa_enabled(char* ifa_name) {
 
 	int allowed_if_names_size = 1;
-	char *allowed_if_names[0] = { "ppp" }; //TODO CARREGAR DE ARQUIVO DE CONFIGURACOES
+	char *allowed_if_names[1] = { "ppp" }; //TODO CARREGAR DE ARQUIVO DE CONFIGURACOES
 
 	int ix;
 	for (ix = 0; ix < allowed_if_names_size; ix++) {

@@ -9,11 +9,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <syslog.h>
+#include <getopt.h>
 
-void substring(int start, int stop, const char *text, char *dst)
-{
-   sprintf(dst, "%.*s", stop - start, &text[start]);
-}
+#include "include/str_utils.h"
 
 int main(int argc, char *argv[])
 {
@@ -27,19 +25,15 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	char action[5];
-	char device_name[15];
-	char device_path[150];
+#define	ACTION 		argv[optind + 0]
+#define	DEVICE_NAME argv[optind + 1]
+#define DEVICE_PATH	argv[optind + 2]
 
-	strcpy(action, argv[1]);
-	strcpy(device_name, argv[2]);
-	strcpy(device_path, argv[3]);
-
-	syslog(LOG_INFO, "Running for %s %s %s\n", action, device_name, device_path);
+	syslog(LOG_INFO, "Running for %s %s %s\n", ACTION, DEVICE_NAME, DEVICE_PATH);
 
 
 	// Verify por == 0 to execute commands.
-	char * str1 = rindex(rindex(device_path, ':')+1, '.')+1;
+	char * str1 = rindex(rindex(DEVICE_PATH, ':')+1, '.')+1;
 	char * str2 = malloc(12);
 	substring(0, 1, str1, str2);
 
