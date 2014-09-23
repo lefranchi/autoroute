@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <syslog.h>
 
 int execute_command(char* command, char** ret_val)
 {
@@ -19,10 +19,10 @@ int execute_command(char* command, char** ret_val)
 
 	fp = popen(command, "r");
 	if (fp == NULL) {
-		printf("Failed to run command %s: \n", command);
+		syslog(LOG_ERR, "Failed to run command %s: \n", command);
 		return 0;
 	} else {
-		printf("Executing: %s \n", command);
+		syslog(LOG_INFO, "Executing: %s \n", command);
 	}
 
 	if (fgets(buff, sizeof(buff) - 1, fp) != NULL) {
@@ -45,10 +45,11 @@ int copy_file(char *source_file, char *target_file)
 	target = fopen(target_file, "w");
 
 	if (source == NULL || target == NULL) {
-		printf("Source or Target file is null...\n");
+
+		syslog(LOG_ERR, "Source or Target file is null...\n");
 
 		if (target == NULL)
-			printf("Execute sudo chmod 777 %s.\n", target_file);
+			syslog(LOG_ERR, "Execute sudo chmod 777 %s.\n", target_file);
 
 		exit(EXIT_FAILURE);
 	}

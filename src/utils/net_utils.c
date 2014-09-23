@@ -18,13 +18,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <linux/if_link.h>
+#include <syslog.h>
 
 #include "../include/sys_utils.h"
 
 int is_ifa_enabled(char* ifa_name) {
 
-	int allowed_if_names_size = 3;
-	char *allowed_if_names[3] = { "ppp" }; //TODO CARREGAR DE ARQUIVO DE CONFIGURACOES
+	int allowed_if_names_size = 1;
+	char *allowed_if_names[0] = { "ppp" }; //TODO CARREGAR DE ARQUIVO DE CONFIGURACOES
 
 	int ix;
 	for (ix = 0; ix < allowed_if_names_size; ix++) {
@@ -85,7 +86,7 @@ int init_rt_tables_file(struct clif clifs[])
 		}
 
 	} else {
-		printf("Error opening file to append: %s\n", RT_TARGET_FILE_PATH);
+		syslog(LOG_ERR, "Error opening file to append: %s\n", RT_TARGET_FILE_PATH);
 		exit(EXIT_FAILURE);
 	}
 

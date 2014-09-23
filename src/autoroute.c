@@ -15,13 +15,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <syslog.h>
 
 int main(int argc, char *argv[])
 {
-
-	printf("Starting autoroute...\n\n");
-
 	struct clif clifs[CLIF_ARRAY_SIZE];
+
+	openlog("autoroute", LOG_PID|LOG_CONS, LOG_USER);
+
+	syslog(LOG_INFO, "Initializing ... ");
 
 	load_clifs(clifs);
 
@@ -39,7 +41,7 @@ int main(int argc, char *argv[])
 
 	route_flush_cache();
 
-	printf("\nFinished!\n");
+	syslog(LOG_INFO, "Finished.");
 
 	exit(EXIT_SUCCESS);
 
