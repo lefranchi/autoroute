@@ -1,3 +1,6 @@
+# Log Files
+*.log
+
 # Object files
 *.o
 *.ko
@@ -21,6 +24,7 @@
 *.dylib
 
 # Executables
+bin/
 *.exe
 *.out
 *.app

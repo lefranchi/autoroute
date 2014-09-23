@@ -1,0 +1,3 @@
+
+ACTION=="add", KERNEL=="ttyUSB*", ENV{DEVNAME}=="/dev/ttyUSB*", RUN+="/home/lfranchi/git/autoroute/udev/udev-exec.sh"
+
