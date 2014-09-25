@@ -8,9 +8,11 @@ all: main
 
 
 main: 
+	rm -rf bin
+	mkdir bin
 	gcc -g -Wall -o bin/autoroute $(AUTOROUTE_OBJS) $(SYS_UTILS_OBJS) $(NET_UTILS_OBJS) $(STR_UTILS_OBJS)
 	gcc -g -Wall -o bin/autoppp $(AUTOPPP_OBJS) $(SYS_UTILS_OBJS) $(NET_UTILS_OBJS) $(STR_UTILS_OBJS)
 	gcc -g -Wall -o bin/atinout src/atinout.c
 
 clean:
-	rm -f *.o autoroute autoppp atinout
+	rm -f bin
