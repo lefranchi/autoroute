@@ -20,7 +20,7 @@ int execute_command(char* command, char** ret_val)
 	fp = popen(command, "r");
 	if (fp == NULL) {
 		syslog(LOG_ERR, "Failed to run command %s: \n", command);
-		return 0;
+		return 1;
 	} else {
 		syslog(LOG_INFO, "Executing: %s \n", command);
 	}
