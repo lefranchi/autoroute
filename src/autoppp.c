@@ -15,12 +15,14 @@
 
 #include "include/str_utils.h"
 #include "include/sys_utils.h"
+#include "include/cel_utils.h"
 
 int main(int argc, char *argv[])
 {
 	char * buff = malloc(15);
 	char command[256];
 	char imsi_code[256];
+	char operator_name[6];
 
 	openlog("autoppp", LOG_PID|LOG_CONS, LOG_USER);
 
@@ -36,7 +38,6 @@ int main(int argc, char *argv[])
 #define DEVICE_PATH	argv[optind + 2]
 
 	syslog(LOG_INFO, "Running for %s %s %s\n", ACTION, DEVICE_NAME, DEVICE_PATH);
-
 
 	// CHECK IF IS THE COMMAND PORT (==0).
 	//------------------------------------------------------------------------
@@ -105,6 +106,15 @@ int main(int argc, char *argv[])
 	strcpy(imsi_code, buff);
 
 	syslog(LOG_INFO, "Extracted %s IMSI Code.", imsi_code);
+
+	//------------------------------------------------------------------------
+
+	// EXECUTE AT+CIMI COMAND TO CHECK OPERATOR CODE.
+	//------------------------------------------------------------------------
+
+	get_operator_name(imsi_code, operator_name);
+
+	syslog(LOG_INFO, "Extracted %s Operator.", operator_name);
 
 	//------------------------------------------------------------------------
 

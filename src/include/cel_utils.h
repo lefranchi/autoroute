@@ -8,7 +8,9 @@
 #ifndef CEL_UTILS_H_
 #define CEL_UTILS_H_
 
-int get_operator_name(char* imsi_code, char* operator_name);
+#define OPERATOR_IMSI_FILE_PATH "./ppp/carrierdb/imsidb"
+
+int get_operator_name(char*, char*);
 
 
 #endif /* CEL_UTILS_H_ */

@@ -28,7 +28,7 @@ struct clif {
 	char rt_name[15];
 };
 
-int is_ifa_enabled(char* ifa_name);
+int is_ifa_enabled(char*);
 
 int find_gateway(char*, char**);
 
