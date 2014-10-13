@@ -96,9 +96,6 @@ int main(int argc, char *argv[])
 
 	sprintf(command, "echo AT+CIMI | atinout - %s - | awk 'NR==2'", DEVICE_NAME);
 
-	//------------------------------------------------------------------------
-
-
 	if (execute_command(command, &buff) != 0) {
 		exit(EXIT_FAILURE);
 	}
