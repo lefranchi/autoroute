@@ -5,6 +5,8 @@
  *      Author: lfranchi
  */
 
+#include <stdio.h>
+
 #include "../include/str_utils.h"
 
 void substring(int start, int stop, const char *text, char *dst)

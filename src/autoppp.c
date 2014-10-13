@@ -7,12 +7,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <syslog.h>
 #include <getopt.h>
 #include <limits.h>
 
 #include "include/str_utils.h"
+#include "include/sys_utils.h"
 
 int main(int argc, char *argv[])
 {
