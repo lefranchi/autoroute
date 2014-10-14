@@ -17,12 +17,12 @@
 #include "include/sys_utils.h"
 #include "include/cel_utils.h"
 
+int execute_for_add(char*, char*);
+
+int execute_for_rem(char*);
+
 int main(int argc, char *argv[])
 {
-	char * buff = malloc(15);
-	char command[256];
-	char imsi_code[256];
-	char operator_name[6];
 
 	openlog("autoppp", LOG_PID|LOG_CONS, LOG_USER);
 
@@ -33,15 +33,32 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-#define	ACTION 		argv[optind + 0]
-#define	DEVICE_NAME argv[optind + 1]
-#define DEVICE_PATH	argv[optind + 2]
+	syslog(LOG_INFO, "Running for %s %s %s %s\n", argv[0], argv[1], argv[2], argv[3]);
 
-	syslog(LOG_INFO, "Running for %s %s %s\n", ACTION, DEVICE_NAME, DEVICE_PATH);
+	if (strcmp(argv[1], "add") == 0 ) {
+		execute_for_add(argv[2], argv[3]);
+	} else if (strcmp(argv[1], "remove") == 0 ) {
+		execute_for_rem(argv[3]);
+	}
+
+	syslog(LOG_INFO, "Finished.");
+
+	closelog();
+
+	return 0;
+}
+
+
+int execute_for_add(char *device_name, char *device_path) {
+
+	char * buff = malloc(15);
+	char command[256];
+	char imsi_code[256];
+	char operator_name[6];
 
 	// CHECK IF IS THE COMMAND PORT (==0).
 	//------------------------------------------------------------------------
-	char * str1 = rindex(rindex(DEVICE_PATH, ':')+1, '.')+1;
+	char * str1 = rindex(rindex(device_path, ':')+1, '.')+1;
 	char * str2 = malloc(12);
 	substring(0, 1, str1, str2);
 
@@ -60,7 +77,7 @@ int main(int argc, char *argv[])
 	// EXECUTE CHMOD 666 ON DEVICE.
 	//------------------------------------------------------------------------
 
-	sprintf(command, "chmod 666 %s", DEVICE_NAME);
+	sprintf(command, "chmod 666 %s", device_name);
 
 	if (execute_command(command, &buff) != 0) {
 		exit(EXIT_FAILURE);
@@ -74,7 +91,7 @@ int main(int argc, char *argv[])
 	strcpy(command, "");
 	strcpy(buff, "");
 
-	sprintf(command, "echo AT | atinout - %s - | grep OK", DEVICE_NAME);
+	sprintf(command, "echo AT | atinout - %s - | grep OK", device_name);
 
 	if (execute_command(command, &buff) != 0) {
 		exit(EXIT_FAILURE);
@@ -95,7 +112,7 @@ int main(int argc, char *argv[])
 	strcpy(command, "");
 	strcpy(buff, "");
 
-	sprintf(command, "echo AT+CIMI | atinout - %s - | awk 'NR==2'", DEVICE_NAME);
+	sprintf(command, "echo AT+CIMI | atinout - %s - | awk 'NR==2'", device_name);
 
 	if (execute_command(command, &buff) != 0) {
 		exit(EXIT_FAILURE);
@@ -124,7 +141,7 @@ int main(int argc, char *argv[])
 	char connection_name[128];
 	strcpy(connection_name, operator_name);
 	strcat(connection_name, "_");
-	strcat(connection_name, rindex(DEVICE_NAME, '/')+1);
+	strcat(connection_name, rindex(device_name, '/')+1);
 
 	char chatscripts_file_path[128] = "./ppp/carrierdb/carrier/";
 	char chatscripts_file_full_path[256];
@@ -160,7 +177,7 @@ int main(int argc, char *argv[])
 	char peers_change_copy_command[256];
 
 	char * dev_name_scaped;
-	dev_name_scaped = str_replace(DEVICE_NAME, "/", "\\/");
+	dev_name_scaped = str_replace(device_name, "/", "\\/");
 
 	sprintf(peers_change_copy_command, "/bin/cat %s | sed 's/${connectionName}/%s/g' | sed 's/${deviceName}/%s/g' > %s", peers_file_full_path, connection_name, dev_name_scaped, peers_file_dest);
 
@@ -180,9 +197,13 @@ int main(int argc, char *argv[])
 	syslog(LOG_INFO, "Executed pon on %s ", connection_name);
 	//------------------------------------------------------------------------
 
-	syslog(LOG_INFO, "Finished.");
+	return 0;
 
-	closelog();
+}
+
+int execute_for_rem(char* device_name) {
+
+	syslog(LOG_INFO, "removing %s", device_name);
 
 	return 0;
 }
