@@ -53,9 +53,9 @@ int main(int argc, char *argv[])
 	syslog(LOG_INFO, "Found port 0 to communicate.");
 	//------------------------------------------------------------------------
 
-	syslog(LOG_INFO, "Waiting for 10 seconds...");
+	syslog(LOG_INFO, "Waiting for 5 seconds...");
 
-	sleep(10);
+	sleep(5);
 
 	// EXECUTE CHMOD 666 ON DEVICE.
 	//------------------------------------------------------------------------
@@ -115,6 +115,58 @@ int main(int argc, char *argv[])
 	get_operator_name(imsi_code, operator_name);
 
 	syslog(LOG_INFO, "Extracted %s Operator.", operator_name);
+
+	//------------------------------------------------------------------------
+
+	// SAVE PPP FILES - chatscripts
+	//------------------------------------------------------------------------
+
+	char connection_name[128];
+	strcpy(connection_name, operator_name);
+	strcat(connection_name, "_");
+	strcat(connection_name, rindex(DEVICE_NAME, '/')+1);
+
+	char chatscripts_file_path[128] = "./ppp/carrierdb/carrier/";
+	char chatscripts_file_full_path[256];
+
+	char chatscripts_file_dest[128] = "/etc/chatscripts/";
+	strcat(chatscripts_file_dest, connection_name);
+
+	strcat(chatscripts_file_path, operator_name);
+	strcat(chatscripts_file_path, "/chatscripts");
+
+	realpath(chatscripts_file_path, chatscripts_file_full_path);
+
+	copy_file(chatscripts_file_full_path, chatscripts_file_dest);
+
+	syslog(LOG_INFO, "Saved %s to %s", chatscripts_file_full_path, chatscripts_file_dest);
+
+	//------------------------------------------------------------------------
+
+	// SAVE PPP FILES - peers
+	//------------------------------------------------------------------------
+
+	char peers_file_path[128] = "./ppp/carrierdb/carrier/";
+	char peers_file_full_path[256];
+
+	strcat(peers_file_path, operator_name);
+	strcat(peers_file_path, "/peers");
+
+	realpath(peers_file_path, peers_file_full_path);
+
+	char peers_file_dest[128] = "/etc/ppp/peers/";
+	strcat(peers_file_dest, connection_name);
+
+	char peers_change_copy_command[256];
+
+	char * dev_name_scaped;
+	dev_name_scaped = str_replace(DEVICE_NAME, "/", "\\/");
+
+	sprintf(peers_change_copy_command, "/bin/cat %s | sed 's/${connectionName}/%s/g' | sed 's/${deviceName}/%s/g' > %s", peers_file_full_path, connection_name, dev_name_scaped, peers_file_dest);
+
+	execute_command(peers_change_copy_command, &buff);
+
+	syslog(LOG_INFO, "Saved %s to %s", peers_file_path, peers_file_dest);
 
 	//------------------------------------------------------------------------
 

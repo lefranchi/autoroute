@@ -10,6 +10,6 @@
 
 void substring(int, int, const char*, char*);
 
-
+char *str_replace(char*, char*, char*);
 
 #endif /* STR_UTILS_H_ */

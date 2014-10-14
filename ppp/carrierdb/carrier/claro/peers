@@ -1,12 +1,11 @@
 hide-password
 noauth
-#connect "/usr/sbin/chat -v -f /etc/chatscripts/tim"
+#connect "/usr/sbin/chat -v -f /etc/chatscripts/claro_ttyUSB0"
 connect "/usr/sbin/chat -v -f /etc/chatscripts/${connectionName}"
 debug
 #/dev/ttyUSB0
 ${deviceName}
-#9600
-${baudRate}
+9600
 defaultroute
 replacedefaultroute
 noipdefault
@@ -26,10 +25,8 @@ nopcomp
 nodeflate
 
 # PAP authentication
-#user "tim"
-user "${user}"
-#remotename tim
-remotename ${remotename}
+user "claro"
+remotename claro
 refuse-chap
 refuse-mschap
 refuse-mschap-v2

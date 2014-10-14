@@ -6,6 +6,6 @@ ABORT 'NO CARRIER'
 
 '' 'ATZ'
 'OK' 'ATE1'
-'OK' 'AT+CGDCONT=1,"IP","${APN}","0.0.0.0",0,0'
+'OK' 'AT+CGDCONT=1,"IP","claro.com.br","0.0.0.0",0,0'
 'OK' 'ATDT*99#'
 'CONNECT' '\c'

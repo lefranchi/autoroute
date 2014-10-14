@@ -1,0 +1,37 @@
+hide-password
+noauth
+#connect "/usr/sbin/chat -v -f /etc/chatscripts/oi_ttyUSB0"
+connect "/usr/sbin/chat -v -f /etc/chatscripts/${connectionName}"
+debug
+#/dev/ttyUSB0
+${deviceName}
+9600
+defaultroute
+replacedefaultroute
+noipdefault
+# usepeerdns
+crtscts
+lock
+local
+
+# Redial and interval
+persist
+holdoff 5
+
+# No compression
+novj
+novjccomp
+nopcomp
+nodeflate
+
+# PAP authentication
+user "oi"
+remotename oi
+refuse-chap
+refuse-mschap
+refuse-mschap-v2
+refuse-eap
+
+# LCP echo messages settings
+lcp-echo-failure 4
+lcp-echo-interval 65535
