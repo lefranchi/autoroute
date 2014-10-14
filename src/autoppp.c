@@ -170,6 +170,16 @@ int main(int argc, char *argv[])
 
 	//------------------------------------------------------------------------
 
+	// EXECUTE PON
+	//------------------------------------------------------------------------
+	char pon_command[128] = "/usr/bin/pon ";
+	strcat(pon_command, connection_name);
+
+	execute_command(pon_command, &buff);
+
+	syslog(LOG_INFO, "Executed pon on %s ", connection_name);
+	//------------------------------------------------------------------------
+
 	syslog(LOG_INFO, "Finished.");
 
 	closelog();
