@@ -19,10 +19,16 @@
 #include <unistd.h>
 #include <linux/if_link.h>
 #include <syslog.h>
+#include <pthread.h>
 
 #include "../include/sys_utils.h"
 
 int CLIF_ARRAY_SIZE_LOADED = 0;
+
+pthread_t tid[CLIF_ARRAY_SIZE_MAX];
+
+volatile int clif_loader_running_threads = 0;
+pthread_mutex_t clif_loader_running_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int is_ifa_enabled(char* ifa_name) {
 
@@ -110,8 +116,6 @@ int print_clif_info(struct clif clifs[])
 
 		if(strlen(clifs[ix].name) == 0)
 			break;
-
-		//printf("--- %s\n", clifs[ix].conn_avg);
 
 		printf("%10s %15s %15s %15s %15f\n", clifs[ix].name, clifs[ix].ip, clifs[ix].gw, clifs[ix].rt_name, clifs[ix].conn_avg);
 
@@ -283,7 +287,25 @@ int load_conn_avg(char* ifa_name, int ping_times, char* targer_test, float* conn
 
 }
 
+//void * load_clif_attr(struct clif clif) {
+void * load_clif_attr(void *arg) {
+
+	struct clif *clif = arg;
+
+	load_conn_avg(clif->name, 4, "www.google.com", &(clif->conn_avg));
+
+	pthread_mutex_lock(&clif_loader_running_mutex);
+	clif_loader_running_threads--;
+	pthread_mutex_unlock(&clif_loader_running_mutex);
+
+	return 0;
+}
+
 int load_conn_attr(struct clif clifs[]) {
+
+	pthread_mutex_lock(&clif_loader_running_mutex);
+	clif_loader_running_threads = CLIF_ARRAY_SIZE_LOADED;
+	pthread_mutex_unlock(&clif_loader_running_mutex);
 
 	int ix;
 	for(ix = 0; ix < CLIF_ARRAY_SIZE_LOADED; ix++) {
@@ -291,9 +313,13 @@ int load_conn_attr(struct clif clifs[]) {
 		if(strlen(clifs[ix].name) == 0)
 			break;
 
-		load_conn_avg(clifs[ix].name, 4, "www.google.com", &(clifs[ix].conn_avg));
+		pthread_create(&(tid[ix]), NULL, &load_clif_attr, &(clifs[ix]));
 
 	}
 
+	while(clif_loader_running_threads > 0)
+		sleep(1);
+
 	return 0;
+
 }
