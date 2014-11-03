@@ -30,6 +30,8 @@ pthread_t tid[CLIF_ARRAY_SIZE_MAX];
 volatile int clif_loader_running_threads = 0;
 pthread_mutex_t clif_loader_running_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+int print_clif_info_header = 0;
+
 int is_ifa_enabled(char* ifa_name) {
 
 	int allowed_if_names_size = 1;
@@ -84,9 +86,6 @@ int init_rt_tables_file(struct clif clifs[])
 		int ix;
 		for(ix = 0; ix < CLIF_ARRAY_SIZE_LOADED; ix++) {
 
-			if(strlen(clifs[ix].name) == 0)
-				break;
-
 			sprintf(rt_name, "%d\trt_%s\n", --rt_index, clifs[ix].name);
 
 			fputs(rt_name, pFile);
@@ -108,20 +107,18 @@ int init_rt_tables_file(struct clif clifs[])
 int print_clif_info(struct clif clifs[])
 {
 
-	printf("%10s %15s %15s %15s %15s\n", "iface", "ip", "gw", "rt", "avg");
-	printf("------------------------------------------------------------------------------- \n");
+	if (print_clif_info_header == 0) {
+		printf("%10s %15s %15s %15s %15s\n", "iface", "ip", "gw", "rt", "avg");
+		printf("------------------------------------------------------------------------------- \n");
+		print_clif_info_header = 1;
+	}
 
 	int ix;
 	for(ix = 0; ix < CLIF_ARRAY_SIZE_LOADED; ix++) {
 
-		if(strlen(clifs[ix].name) == 0)
-			break;
-
 		printf("%10s %15s %15s %15s %15f\n", clifs[ix].name, clifs[ix].ip, clifs[ix].gw, clifs[ix].rt_name, clifs[ix].conn_avg);
 
 	}
-
-	printf("------------------------------------------------------------------------------- \n");
 
 	return 0;
 
@@ -134,9 +131,6 @@ int define_rt_tables(struct clif clifs[])
 
 	int ix;
 	for(ix = 0; ix < CLIF_ARRAY_SIZE_LOADED; ix++) {
-
-		if(strlen(clifs[ix].name) == 0)
-			break;
 
 		sprintf(command, "/sbin/ip route del default via %s table %s", clifs[ix].gw, clifs[ix].rt_name);
 
@@ -160,9 +154,6 @@ int define_rt_rules(struct clif clifs[])
 
 	int ix;
 	for(ix = 0; ix < CLIF_ARRAY_SIZE_LOADED; ix++) {
-
-		if(strlen(clifs[ix].name) == 0)
-			break;
 
 		sprintf(command, "/sbin/ip rule del from %s table %s", clifs[ix].ip, clifs[ix].rt_name);
 
@@ -199,9 +190,6 @@ int balance_links(struct clif clifs[])
 	int ix;
 	for(ix = 0; ix < CLIF_ARRAY_SIZE_LOADED; ix++) {
 
-		if(strlen(clifs[ix].name) == 0)
-			break;
-
 		sprintf(nexthop_buffer, nexthop_template, clifs[ix].gw, clifs[ix].name);
 
 		strcat(command, nexthop_buffer);
@@ -226,6 +214,8 @@ int load_clifs(struct clif clifs[])
 	char host[NI_MAXHOST];
 	char gw[NI_MAXHOST];
 	int clif_index = 0;
+
+	CLIF_ARRAY_SIZE_LOADED = 0;
 
 	if (getifaddrs(&ifaddr) == -1) {
 		perror("getifaddrs");
@@ -309,9 +299,6 @@ int load_conn_attr(struct clif clifs[]) {
 
 	int ix;
 	for(ix = 0; ix < CLIF_ARRAY_SIZE_LOADED; ix++) {
-
-		if(strlen(clifs[ix].name) == 0)
-			break;
 
 		pthread_create(&(tid[ix]), NULL, &load_clif_attr, &(clifs[ix]));
 

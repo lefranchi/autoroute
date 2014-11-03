@@ -13,39 +13,45 @@
 #include "include/sys_utils.h"
 #include "include/net_utils.h"
 
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <syslog.h>
+#include <signal.h>
 
 int main(int argc, char *argv[])
 {
+
+	int sleep_time = 5; //TODO: LER DE CONFIG.
+
 	struct clif clifs[CLIF_ARRAY_SIZE_MAX];
 
 	openlog("autoroute", LOG_PID|LOG_CONS, LOG_USER);
 
 	syslog(LOG_INFO, "Initializing ... ");
 
-	load_clifs(clifs);
+	while(1) {
 
-	load_conn_attr(clifs);
+		load_clifs(clifs);
 
-	//init_rt_tables_file(clifs);
+		load_conn_attr(clifs);
 
-	print_clif_info(clifs);
+		//init_rt_tables_file(clifs);
 
-	//define_rt_tables(clifs);
+		print_clif_info(clifs);
 
-	//define_rt_rules(clifs);
+		//define_rt_tables(clifs);
 
-	//delete_nexthop_route();
+		//define_rt_rules(clifs);
 
-	//balance_links(clifs);
+		//delete_nexthop_route();
 
-	//route_flush_cache();
+		//balance_links(clifs);
 
-	syslog(LOG_INFO, "Finished.");
+		//route_flush_cache();
 
-	exit(EXIT_SUCCESS);
+		sleep(sleep_time);
+
+	}
 
 }
-
