@@ -79,7 +79,7 @@ int execute_for_add(char *device_name, char *device_path) {
 
 	sprintf(command, "chmod 666 %s", device_name);
 
-	if (execute_command(command, &buff) != 0) {
+	if (execute_command(command, buff) != 0) {
 		exit(EXIT_FAILURE);
 	}
 
@@ -93,7 +93,7 @@ int execute_for_add(char *device_name, char *device_path) {
 
 	sprintf(command, "echo AT | atinout - %s - | grep OK", device_name);
 
-	if (execute_command(command, &buff) != 0) {
+	if (execute_command(command, buff) != 0) {
 		exit(EXIT_FAILURE);
 	}
 
@@ -114,7 +114,7 @@ int execute_for_add(char *device_name, char *device_path) {
 
 	sprintf(command, "echo AT+CIMI | atinout - %s - | awk 'NR==2'", device_name);
 
-	if (execute_command(command, &buff) != 0) {
+	if (execute_command(command, buff) != 0) {
 		exit(EXIT_FAILURE);
 	}
 
@@ -181,7 +181,7 @@ int execute_for_add(char *device_name, char *device_path) {
 
 	sprintf(peers_change_copy_command, "/bin/cat %s | sed 's/${connectionName}/%s/g' | sed 's/${deviceName}/%s/g' > %s", peers_file_full_path, connection_name, dev_name_scaped, peers_file_dest);
 
-	execute_command(peers_change_copy_command, &buff);
+	execute_command(peers_change_copy_command, buff);
 
 	syslog(LOG_INFO, "Saved %s to %s", peers_file_path, peers_file_dest);
 
@@ -192,7 +192,7 @@ int execute_for_add(char *device_name, char *device_path) {
 	char pon_command[128] = "/usr/bin/pon ";
 	strcat(pon_command, connection_name);
 
-	execute_command(pon_command, &buff);
+	execute_command(pon_command, buff);
 
 	syslog(LOG_INFO, "Executed pon on %s ", connection_name);
 	//------------------------------------------------------------------------

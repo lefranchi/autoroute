@@ -22,10 +22,13 @@
 
 #include "../include/sys_utils.h"
 
+int CLIF_ARRAY_SIZE_LOADED = 0;
+
 int is_ifa_enabled(char* ifa_name) {
 
 	int allowed_if_names_size = 1;
-	char *allowed_if_names[1] = { "ppp" }; //TODO CARREGAR DE ARQUIVO DE CONFIGURACOES
+	//char *allowed_if_names[1] = { "ppp" }; //TODO CARREGAR DE ARQUIVO DE CONFIGURACOES
+	char *allowed_if_names[1] = { "eth0" };
 
 	int ix;
 	for (ix = 0; ix < allowed_if_names_size; ix++) {
@@ -38,16 +41,17 @@ int is_ifa_enabled(char* ifa_name) {
 	return 0;
 }
 
-int find_gateway(char* ifname, char** ifgw)
+int find_gateway(char* ifname, char* ifgw)
 {
 
 	char command[80] = "";
+	strcpy(ifgw, "");
 
 	sprintf(command, "/sbin/route -n | grep %s | grep '^0.0.0.0' | awk '{ print $2 }'", ifname);
 
 	int ret_value = execute_command(command, ifgw);
 
-	if (strcmp(*ifgw, "") == 0) {
+	if (strcmp(ifgw, "") == 0) {
 
 		sprintf(command, "/sbin/ifconfig %s | grep P-t-P | awk '{print $3}' | awk -F: '{print $2}'", ifname);
 
@@ -72,7 +76,7 @@ int init_rt_tables_file(struct clif clifs[])
 	if(pFile != NULL) {
 
 		int ix;
-		for(ix = 0; ix < CLIF_ARRAY_SIZE; ix++) {
+		for(ix = 0; ix < CLIF_ARRAY_SIZE_LOADED; ix++) {
 
 			if(strlen(clifs[ix].name) == 0)
 				break;
@@ -98,16 +102,18 @@ int init_rt_tables_file(struct clif clifs[])
 int print_clif_info(struct clif clifs[])
 {
 
-	printf("%10s %15s %15s %15s \n", "iface", "ip", "gw", "rt");
+	printf("%10s %15s %15s %15s %15s\n", "iface", "ip", "gw", "rt", "avg");
 	printf("------------------------------------------------------------------------------- \n");
 
 	int ix;
-	for(ix = 0; ix < CLIF_ARRAY_SIZE; ix++) {
+	for(ix = 0; ix < CLIF_ARRAY_SIZE_LOADED; ix++) {
 
 		if(strlen(clifs[ix].name) == 0)
 			break;
 
-		printf("%10s %15s %15s %15s \n", clifs[ix].name, clifs[ix].ip, clifs[ix].gw, clifs[ix].rt_name);
+		//printf("--- %s\n", clifs[ix].conn_avg);
+
+		printf("%10s %15s %15s %15s %15f\n", clifs[ix].name, clifs[ix].ip, clifs[ix].gw, clifs[ix].rt_name, clifs[ix].conn_avg);
 
 	}
 
@@ -123,18 +129,18 @@ int define_rt_tables(struct clif clifs[])
 	char command[256];
 
 	int ix;
-	for(ix = 0; ix < CLIF_ARRAY_SIZE; ix++) {
+	for(ix = 0; ix < CLIF_ARRAY_SIZE_LOADED; ix++) {
 
 		if(strlen(clifs[ix].name) == 0)
 			break;
 
 		sprintf(command, "/sbin/ip route del default via %s table %s", clifs[ix].gw, clifs[ix].rt_name);
 
-		execute_command(command, &buff);
+		execute_command(command, buff);
 
 		sprintf(command, "/sbin/ip route add default via %s table %s", clifs[ix].gw, clifs[ix].rt_name);
 
-		execute_command(command, &buff);
+		execute_command(command, buff);
 
 	}
 
@@ -149,18 +155,18 @@ int define_rt_rules(struct clif clifs[])
 	char command[256];
 
 	int ix;
-	for(ix = 0; ix < CLIF_ARRAY_SIZE; ix++) {
+	for(ix = 0; ix < CLIF_ARRAY_SIZE_LOADED; ix++) {
 
 		if(strlen(clifs[ix].name) == 0)
 			break;
 
 		sprintf(command, "/sbin/ip rule del from %s table %s", clifs[ix].ip, clifs[ix].rt_name);
 
-		execute_command(command, &buff);
+		execute_command(command, buff);
 
 		sprintf(command, "/sbin/ip rule add from %s table %s", clifs[ix].ip, clifs[ix].rt_name);
 
-		execute_command(command, &buff);
+		execute_command(command, buff);
 
 	}
 
@@ -173,7 +179,7 @@ int delete_nexthop_route()
 {
 	char *buff = malloc(15);
 
-	return execute_command("ip route del default scope global", &buff);
+	return execute_command("ip route del default scope global", buff);
 
 }
 
@@ -187,7 +193,7 @@ int balance_links(struct clif clifs[])
 	strcpy(command, "/sbin/ip route add default scope global ");
 
 	int ix;
-	for(ix = 0; ix < CLIF_ARRAY_SIZE; ix++) {
+	for(ix = 0; ix < CLIF_ARRAY_SIZE_LOADED; ix++) {
 
 		if(strlen(clifs[ix].name) == 0)
 			break;
@@ -198,7 +204,7 @@ int balance_links(struct clif clifs[])
 
 	}
 
-	return execute_command(command, &buff);
+	return execute_command(command, buff);
 
 }
 
@@ -206,7 +212,7 @@ int route_flush_cache()
 {
 	char *buff = malloc(15);
 
-	return execute_command("/sbin/ip route flush cache", &buff);
+	return execute_command("/sbin/ip route flush cache", buff);
 }
 
 int load_clifs(struct clif clifs[])
@@ -214,7 +220,7 @@ int load_clifs(struct clif clifs[])
 	struct ifaddrs *ifaddr, *ifa;
 	int family, s, n;
 	char host[NI_MAXHOST];
-	char *gw = malloc(15);
+	char gw[NI_MAXHOST];
 	int clif_index = 0;
 
 	if (getifaddrs(&ifaddr) == -1) {
@@ -245,18 +251,49 @@ int load_clifs(struct clif clifs[])
 				continue;
 			}
 
-			find_gateway(ifa->ifa_name, &gw);
+			find_gateway(ifa->ifa_name, gw);
 
 			strcpy(clifs[clif_index].name, ifa->ifa_name);
 			strcpy(clifs[clif_index].ip, host);
 			strcpy(clifs[clif_index++].gw, gw);
 
+			CLIF_ARRAY_SIZE_LOADED++;
 		}
 
 	}
 
-	free(gw);
 	freeifaddrs(ifaddr);
+
+	return 0;
+}
+
+int load_conn_avg(char* ifa_name, int ping_times, char* targer_test, float* conn_avg) {
+
+	char buff[128];
+	char command_template[128] = "/bin/ping -I %s -c %u %s | tail -1 | awk '{print $4}' | cut -d '/' -f 2";
+	char command[128] = "";
+
+	sprintf(command, command_template, ifa_name, ping_times, targer_test);
+
+	execute_command(command, buff);
+
+	*conn_avg = atof(buff);
+
+	return 0;
+
+}
+
+int load_conn_attr(struct clif clifs[]) {
+
+	int ix;
+	for(ix = 0; ix < CLIF_ARRAY_SIZE_LOADED; ix++) {
+
+		if(strlen(clifs[ix].name) == 0)
+			break;
+
+		load_conn_avg(clifs[ix].name, 4, "www.google.com", &(clifs[ix].conn_avg));
+
+	}
 
 	return 0;
 }

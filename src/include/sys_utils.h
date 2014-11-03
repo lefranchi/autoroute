@@ -8,7 +8,7 @@
 #ifndef AUTOROUTE_UTILS_H_
 #define AUTOROUTE_UTILS_H_
 
-int execute_command(char*, char**);
+int execute_command(char*, char*);
 
 int copy_file(char*, char*);
 

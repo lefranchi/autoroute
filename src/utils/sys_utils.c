@@ -12,7 +12,7 @@
 #include <string.h>
 #include <syslog.h>
 
-int execute_command(char* command, char** ret_val)
+int execute_command(char* command, char* ret_val)
 {
 	FILE *fp;
 	char buff[2048];
@@ -26,9 +26,9 @@ int execute_command(char* command, char** ret_val)
 	}
 
 	if (fgets(buff, sizeof(buff) - 1, fp) != NULL) {
-		strncpy(*ret_val, buff, strlen(buff) - 1);
+		strncpy(ret_val, buff, strlen(buff) - 1);
 	} else {
-		strcpy(*ret_val, "");
+		strcpy(ret_val, "");
 	}
 
 	pclose(fp);

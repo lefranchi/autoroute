@@ -19,7 +19,7 @@
 
 int main(int argc, char *argv[])
 {
-	struct clif clifs[CLIF_ARRAY_SIZE];
+	struct clif clifs[CLIF_ARRAY_SIZE_MAX];
 
 	openlog("autoroute", LOG_PID|LOG_CONS, LOG_USER);
 
@@ -27,19 +27,21 @@ int main(int argc, char *argv[])
 
 	load_clifs(clifs);
 
-	init_rt_tables_file(clifs);
+	load_conn_attr(clifs);
+
+	//init_rt_tables_file(clifs);
 
 	print_clif_info(clifs);
 
-	define_rt_tables(clifs);
+	//define_rt_tables(clifs);
 
-	define_rt_rules(clifs);
+	//define_rt_rules(clifs);
 
-	delete_nexthop_route();
+	//delete_nexthop_route();
 
-	balance_links(clifs);
+	//balance_links(clifs);
 
-	route_flush_cache();
+	//route_flush_cache();
 
 	syslog(LOG_INFO, "Finished.");
 
