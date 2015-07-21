@@ -51,13 +51,15 @@ int is_ifa_enabled(char* ifa_name) {
 
 int find_gateway(char* ifname, char* ifgw)
 {
-
+	char ip[NI_MAXHOST];
 	char command[80] = "";
 	strcpy(ifgw, "");
 
 	sprintf(command, "/sbin/route -n | grep %s | grep '^0.0.0.0' | awk '{ print $2 }'", ifname);
 
-	int ret_value = execute_command(command, ifgw);
+	int ret_value = execute_command(command, ip);
+
+	strcpy(ifgw, ip);
 
 	if (strcmp(ifgw, "") == 0) {
 
@@ -245,6 +247,7 @@ int load_clifs(struct clif clifs[])
 				continue;
 			}
 
+			strcpy(gw, "");
 			find_gateway(ifa->ifa_name, gw);
 
 			strcpy(clifs[clif_index].name, ifa->ifa_name);

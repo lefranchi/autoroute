@@ -54,4 +54,6 @@ int main(int argc, char *argv[])
 
 	}
 
+	syslog(LOG_INFO, "Finalized !!! ");
+
 }
