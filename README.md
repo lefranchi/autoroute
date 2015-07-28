@@ -1,29 +1,18 @@
-# README #
+# autoroute #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Este sistema contém uma série de programas que em conjunto fornecem um meio de comunicaçào balanceada utilizando os meios de rede disponiveis, incluindo conexão Móvel.
 
-### What is this repository for? ###
+### autoppp ###
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+Este programa executa identifica a operadora do device conectado e efetua a configuração e auto conexão com a mesma. Seus artefatos são:
 
-### How do I get set up? ###
+* Udev: Regras para identificação de adição/remoção de modems. Após a detecção do mesmo o script deverá executar o programa autoppp;
+* Programa autoppp: Responsável por identificar a operadora, gerar os arquivos de configuração e efetuar a conexão;
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+### autoroute ###
 
-### Contribution guidelines ###
+Programa que identifica interfaces de rede, calcula a disponibilidade de cada uma delas e efetua o retemaneto automático entre elas.
 
-* Writing tests
-* Code review
-* Other guidelines
+### atinout ###
 
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+Programa que executas comandos AT em dispositivos.

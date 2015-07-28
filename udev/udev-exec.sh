@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# echo "ENTROU UDEV --> ACTION[$ACTION] DEVNAME[$DEVNAME] DEVPATH[$DEVPATH]" >> /var/log/syslog
+logger "EXECUTANDO UDEV --> ACTION[$ACTION] DEVNAME[$DEVNAME] DEVPATH[$DEVPATH]"
 
 
 # /home/lfranchi/work/workspaces/autoroute/bin/autoppp $ACTION $DEVNAME $DEVPATH
 
-/home/lfranchi/git/autoroute/bin/autoppp $ACTION $DEVNAME $DEVPATH  
+/home/pi/autoroute/bin/autoppp $ACTION $DEVNAME $DEVPATH  
 
