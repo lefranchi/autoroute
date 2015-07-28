@@ -7,6 +7,7 @@ Este sistema contém uma série de programas que em conjunto fornecem um meio de
 Este programa executa identifica a operadora do device conectado e efetua a configuração e auto conexão com a mesma. Seus artefatos são:
 
 * Udev: Regras para identificação de adição/remoção de modems. Após a detecção do mesmo o script deverá executar o programa autoppp;
+** *.rules: Deve ser salvo em /etc/rules.d/. Atualizar com path do script;
 * Programa autoppp: Responsável por identificar a operadora, gerar os arquivos de configuração e efetuar a conexão;
 
 ### autoroute ###
