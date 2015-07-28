@@ -9,7 +9,8 @@ Este programa executa identifica a operadora do device conectado e efetua a conf
 + Udev: Regras para identificação de adição/remoção de modems. Após a detecção do mesmo o script deverá executar o programa autoppp;
     * Script Shell: Deve ser alterado para apontar o path do programa autoppp;
     * Arquivo.rules: Deve ser salvo em /etc/rules.d/. Atualizar com path do script;
-* Programa autoppp: Responsável por identificar a operadora, gerar os arquivos de configuração e efetuar a conexão;
++ Programa autoppp: Responsável por identificar a operadora, gerar os arquivos de configuração e efetuar a conexão;
+    * TODO: Configuração manual do pppd.
 
 ### autoroute ###
 
