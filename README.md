@@ -10,7 +10,10 @@ Este programa executa identifica a operadora do device conectado e efetua a conf
     * Script Shell: Deve ser alterado para apontar o path do programa autoppp;
     * Arquivo.rules: Deve ser salvo em /etc/rules.d/. Atualizar com path do script;
 + Programa autoppp: Responsável por identificar a operadora, gerar os arquivos de configuração e efetuar a conexão;
-    * TODO: Configuração manual do pppd.
+    * Configuração Manual:
+        1. Salvar arquivo chatscripts em /etc/chatscripts/ - Observar informações da Operadora;
+        1. Salvar o arquivo peers em /etc/ppp/peers/ - Utilizando o ttyUSBx correto;
+        1. Executar pon/poff para conectar/desconectar o ppp.
 
 ### autoroute ###
 
